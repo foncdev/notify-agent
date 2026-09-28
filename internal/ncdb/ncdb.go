@@ -20,6 +20,8 @@ import (
 
 	"howett.net/plist"
 	_ "modernc.org/sqlite"
+
+	"github.com/foncdev/notify-agent/internal/lang"
 )
 
 // Notification은 알림 하나다.
@@ -40,7 +42,8 @@ func DefaultPath() string {
 }
 
 // ErrNoAccess는 전체 디스크 접근 권한이 없어 읽지 못했을 때다.
-var ErrNoAccess = errors.New("알림 기록을 읽을 수 없습니다. 시스템 설정 > 개인정보 보호 및 보안 > 전체 디스크 접근에서 notify-agent를 허용하세요")
+var ErrNoAccess error = lang.NewError("알림 기록을 읽을 수 없습니다. 시스템 설정 > 개인정보 보호 및 보안 > 전체 디스크 접근에서 notify-agent를 허용하세요",
+	"Can't read the notification history. Allow notify-agent in System Settings > Privacy & Security > Full Disk Access")
 
 // Reader는 알림 기록을 읽는다.
 type Reader struct {
@@ -61,7 +64,7 @@ func (r Reader) After(id int64) ([]Notification, error) {
 		WHERE r.rec_id > ?
 		ORDER BY r.rec_id`, id)
 	if err != nil {
-		return nil, fmt.Errorf("알림 기록의 모양이 예상과 다릅니다(macOS가 바뀌었을 수 있다): %w", err)
+		return nil, fmt.Errorf(lang.L("알림 기록의 모양이 예상과 다릅니다(macOS가 바뀌었을 수 있다): %w", "Unexpected notification history format (macOS may have changed): %w"), err)
 	}
 	defer rows.Close()
 
@@ -97,7 +100,7 @@ func (r Reader) LastID() (int64, error) {
 	defer cleanup()
 	var id sql.NullInt64
 	if err := db.QueryRow(`SELECT MAX(rec_id) FROM record`).Scan(&id); err != nil {
-		return 0, fmt.Errorf("알림 기록의 모양이 예상과 다릅니다: %w", err)
+		return 0, fmt.Errorf(lang.L("알림 기록의 모양이 예상과 다릅니다: %w", "Unexpected notification history format: %w"), err)
 	}
 	return id.Int64, nil
 }
@@ -120,7 +123,7 @@ func (r Reader) Apps() ([]AppCount, error) {
 		FROM record r LEFT JOIN app a ON a.app_id = r.app_id
 		GROUP BY a.identifier ORDER BY COUNT(*) DESC`)
 	if err != nil {
-		return nil, fmt.Errorf("알림 기록의 모양이 예상과 다릅니다: %w", err)
+		return nil, fmt.Errorf(lang.L("알림 기록의 모양이 예상과 다릅니다: %w", "Unexpected notification history format: %w"), err)
 	}
 	defer rows.Close()
 	var out []AppCount
@@ -144,7 +147,7 @@ func (r Reader) open() (*sql.DB, func(), error) {
 		if errors.Is(err, os.ErrPermission) {
 			return nil, nil, ErrNoAccess
 		}
-		return nil, nil, fmt.Errorf("알림 기록이 없습니다(%s): %w", path, err)
+		return nil, nil, fmt.Errorf(lang.L("알림 기록이 없습니다(%s): %w", "No notification history (%s): %w"), path, err)
 	}
 
 	dir, err := os.MkdirTemp("", "notify-agent-")

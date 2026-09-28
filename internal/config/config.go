@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/foncdev/notify-agent/internal/lang"
 )
 
 type Config struct {
@@ -52,6 +54,9 @@ func Load(envFile string) (Config, error) {
 		return def
 	}
 
+	// 글 언어. 이 뒤의 오류와 알림 글이 이 언어로 나온다.
+	lang.Set(lang.Parse(get("RELAY_LANG", "")))
+
 	home, _ := os.UserHomeDir()
 	c := Config{
 		RelayURL:  get("NOTIFY_RELAY_URL", "http://127.0.0.1:4100"),
@@ -66,7 +71,7 @@ func Load(envFile string) (Config, error) {
 	}
 	poll, err := time.ParseDuration(get("NOTIFY_POLL", "5s"))
 	if err != nil || poll < time.Second {
-		return Config{}, fmt.Errorf("NOTIFY_POLL이 잘못됐습니다(1s 이상, 예: 5s): %q", get("NOTIFY_POLL", ""))
+		return Config{}, fmt.Errorf(lang.L("NOTIFY_POLL이 잘못됐습니다(1s 이상, 예: 5s): %q", "Invalid NOTIFY_POLL (1s or more, e.g. 5s): %q"), get("NOTIFY_POLL", ""))
 	}
 	c.Poll = poll
 	return c, nil

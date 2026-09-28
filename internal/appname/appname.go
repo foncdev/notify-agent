@@ -12,6 +12,8 @@ import (
 	"sync"
 
 	"howett.net/plist"
+
+	"github.com/foncdev/notify-agent/internal/lang"
 )
 
 var (
@@ -37,7 +39,7 @@ func lookup(bundleID string) string {
 		fallback = bundleID[i+1:]
 	}
 	if bundleID == "" {
-		return "알림"
+		return lang.L("알림", "Notification")
 	}
 	out, err := exec.Command("mdfind", "kMDItemCFBundleIdentifier == '"+strings.ReplaceAll(bundleID, "'", "")+"'").Output()
 	if err != nil {

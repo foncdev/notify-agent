@@ -28,6 +28,7 @@ import (
 
 	"github.com/foncdev/notify-agent/internal/appname"
 	"github.com/foncdev/notify-agent/internal/config"
+	"github.com/foncdev/notify-agent/internal/lang"
 	"github.com/foncdev/notify-agent/internal/ncdb"
 	"github.com/foncdev/notify-agent/internal/relay"
 	"github.com/foncdev/notify-agent/internal/state"
@@ -36,7 +37,7 @@ import (
 var version = "dev"
 
 func main() {
-	envFile := flag.String("env", config.DefaultEnvFile(), "설정 파일")
+	envFile := flag.String("env", config.DefaultEnvFile(), lang.L("설정 파일", "Settings file"))
 	flag.Parse()
 	log.SetFlags(log.LstdFlags)
 
@@ -52,17 +53,25 @@ func main() {
 	case "apps":
 		err = listApps(reader)
 	case "test":
-		err = client(cfg).Send(relay.Message{Title: "[notify-agent] 시험 알림", Body: "맥 알림을 relay-service로 넘길 수 있습니다."})
+		err = client(cfg).Send(TestMessage())
 		if err == nil {
-			fmt.Println("보냈습니다. 안경·폰의 알림 목록을 보세요.")
+			fmt.Println(lang.L("보냈습니다. 안경·폰의 알림 목록을 보세요.", "Sent. Check the notification list on your glasses or phone."))
 		}
 	case "version":
 		fmt.Println(version)
 	default:
-		err = fmt.Errorf("모르는 명령: %s (run·apps·test·version)", flag.Arg(0))
+		err = fmt.Errorf(lang.L("모르는 명령: %s (run·apps·test·version)", "Unknown command: %s (run, apps, test, version)"), flag.Arg(0))
 	}
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+// TestMessage는 `notify-agent test`가 보내는 시험 알림이다.
+func TestMessage() relay.Message {
+	return relay.Message{
+		Title: lang.L("[notify-agent] 시험 알림", "[notify-agent] Test notification"),
+		Body:  lang.L("맥 알림을 relay-service로 넘길 수 있습니다.", "Mac notifications can be forwarded to relay-service."),
 	}
 }
 
@@ -75,17 +84,18 @@ func listApps(reader ncdb.Reader) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("알림 수  번들 id  (앱 이름)")
+	fmt.Println(lang.L("알림 수  번들 id  (앱 이름)", "  count  bundle id  (app name)"))
 	for _, a := range apps {
 		fmt.Printf("%7d  %s  (%s)\n", a.Count, a.App, appname.Of(a.App))
 	}
-	fmt.Println("\n가져올 앱의 번들 id를 NOTIFY_APPS에 쉼표로 적으세요.")
+	fmt.Println(lang.L("\n가져올 앱의 번들 id를 NOTIFY_APPS에 쉼표로 적으세요.", "\nPut the bundle ids of the apps to forward in NOTIFY_APPS, separated by commas."))
 	return nil
 }
 
 func run(cfg config.Config, reader ncdb.Reader) error {
 	if cfg.HookKey == "" {
-		return errors.New("NOTIFY_HOOK_KEY가 없습니다. relay-service의 RELAY_HOOK_KEY를 적으세요")
+		return errors.New(lang.L("NOTIFY_HOOK_KEY가 없습니다. relay-service의 RELAY_HOOK_KEY를 적으세요",
+			"NOTIFY_HOOK_KEY is missing. Set it to relay-service's RELAY_HOOK_KEY"))
 	}
 	if len(cfg.Apps) == 0 {
 		log.Print("NOTIFY_APPS가 비어 있어 아무 알림도 보내지 않습니다. `notify-agent apps`로 보고 정하세요.")

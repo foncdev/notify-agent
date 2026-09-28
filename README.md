@@ -56,6 +56,12 @@ tail -f ~/Library/Logs/notify-agent.log
 | `NOTIFY_POLL` | `5s` | 알림 기록을 들여다보는 간격 |
 | `NOTIFY_STATE` | `~/Library/Application Support/notify-agent/state.json` | 어디까지 보냈는지 |
 | `NOTIFY_DB` | macOS 기본 자리 | 알림 기록 파일 |
+| `RELAY_LANG` | `ko` | 글 언어. `en`으로 시작하면 영어, 그 밖은 한국어. relay-service의 `RELAY_LANG`, 폰 앱의 언어와 같게 둔다 |
+
+`RELAY_LANG`은 relay-service·terminal-agent와 같은 변수다. 시험 알림(`[notify-agent] 시험 알림` /
+`[notify-agent] Test notification`), 명령줄 출력과 오류, 앱 이름을 모를 때 쓰는 제목(`알림` /
+`Notification`)이 이 언어를 따른다. 넘겨 주는 맥 알림의 내용은 그대로다. 로그의 시작·종료 줄은
+relay-service처럼 한국어로 남긴다. 바꾼 뒤에는 agent를 다시 켜야 한다.
 
 ## 동작
 

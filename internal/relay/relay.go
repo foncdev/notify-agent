@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/foncdev/notify-agent/internal/lang"
 )
 
 // Client는 relay-service 알림 훅에 보낸다.
@@ -52,12 +54,12 @@ func (c Client) Send(m Message) error {
 	}
 	res, err := hc.Do(req)
 	if err != nil {
-		return fmt.Errorf("relay-service에 보내지 못했습니다: %w", err)
+		return fmt.Errorf(lang.L("relay-service에 보내지 못했습니다: %w", "Couldn't send to relay-service: %w"), err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode >= 300 {
 		msg, _ := io.ReadAll(io.LimitReader(res.Body, 512))
-		return fmt.Errorf("relay-service가 받지 않았습니다(%d): %s", res.StatusCode, strings.TrimSpace(string(msg)))
+		return fmt.Errorf(lang.L("relay-service가 받지 않았습니다(%d): %s", "relay-service rejected it (%d): %s"), res.StatusCode, strings.TrimSpace(string(msg)))
 	}
 	return nil
 }
