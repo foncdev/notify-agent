@@ -86,3 +86,14 @@ make build
 ```sh
 make uninstall
 ```
+
+## 관련
+
+- [relay-service](https://github.com/foncdev/relay-service) — 알림을 받는 중계 서버. 이 프로그램은 그 알림 훅(`/hooks/notify/mac`)으로 보낸다
+- [relay-ios](https://github.com/foncdev/relay-ios) — 안경의 서버가 되는 iOS 앱. iOS는 다른 앱 알림을 읽을 수 없어 맥을 거친다
+- [relay-android](https://github.com/foncdev/relay-android) — 같은 역할의 Android 앱. Android는 폰에서 알림을 직접 가져온다(알림 접근)
+- [terminal-agent](https://github.com/foncdev/terminal-agent) — 맥의 셸 agent. 전체 디스크 접근을 주지 않으려고 이 프로그램을 따로 뗐다
+
+## 라이선스
+
+MIT — [LICENSE](LICENSE) 참고.
