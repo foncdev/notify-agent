@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/icon.svg" width="112" alt="notify-agent 아이콘"></p>
+
 # notify-agent
 
 맥의 알림 센터에 온 알림(카카오톡 맥 버전, 슬랙, 메일 등)을 relay-service로 넘긴다.
