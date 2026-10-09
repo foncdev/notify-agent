@@ -20,8 +20,12 @@
 ## 설치
 
 ```sh
-make install
+curl -fsSL https://raw.githubusercontent.com/foncdev/notify-agent/main/install.sh | sh
 ```
+
+[Releases](https://github.com/foncdev/notify-agent/releases)에서 이 맥에 맞는 `notify-agent_darwin_<arch>.tar.gz`를 받아
+(`checksums.txt`로 확인) 안에 든 `scripts/install.sh`로 설치한다. 실행 파일은 Developer ID로 서명·공증했다.
+소스에서 설치하려면 `make install`. 이름 규칙은 terminal-agent·claudeAgent와 같다.
 
 설치하면 `~/.local/bin/notify-agent`에 두고, 로그인할 때마다 켜지게 한다(LaunchAgent).
 처음 설치할 때 훅 키를 만들어 `~/.config/notify-agent/env`에 적고, relay-service에 넣을 줄을 보여 준다.
@@ -92,8 +96,19 @@ make build
 ## 지우기
 
 ```sh
-make uninstall
+curl -fsSL https://raw.githubusercontent.com/foncdev/notify-agent/main/install.sh | sh -s -- --uninstall
+# 또는 소스에서: make uninstall
 ```
+
+## 릴리스
+
+```sh
+git tag v0.1.0
+DEVELOPER_ID="Developer ID Application: 이름 (TEAMID)" NOTARY_PROFILE=notary make dist
+gh release create v0.1.0 dist/notify-agent_darwin_*.tar.gz dist/checksums.txt
+```
+
+맥 전용이라 서명·공증을 이 맥에서 하고 올린다. 서명하면 새 판을 깔아도 전체 디스크 접근이 이어지기 쉽다.
 
 ## 관련
 
